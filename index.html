@@ -1,1 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UP Entrance</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #020617;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <iframe 
+    id="appFrame"
+    src="https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec" 
+    allow="camera; microphone"
+    allowfullscreen>
+  </iframe>
 
+  <script>
+    // Passes query parameters (like ?page=scanner or ?page=admin) directly to Apps Script
+    const currentParams = window.location.search;
+    if (currentParams) {
+      const iframe = document.getElementById('appFrame');
+      iframe.src = "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec" + currentParams;
+    }
+  </script>
+</body>
+</html>
