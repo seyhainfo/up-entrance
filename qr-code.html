@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>កម្មវិធីបង្កើត QR Code ទំនើប - QR Code Generator with Logo</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Kantumruy Pro for Khmer & Inter for English -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Kantumruy+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- QR Code Styling Library -->
+  <script type="text/javascript" src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Kantumruy Pro"', 'Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Kantumruy Pro', 'Inter', sans-serif;
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+  <header class="bg-white/80 backdrop-blur-md sticky top-0 z-40 border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-200">
+          <i class="fa-solid fa-qrcode text-xl"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold text-slate-900 tracking-tight leading-none">QR Code Pro by CHROENG Seyha</h1>
+          <p class="text-xs text-slate-500 font-medium mt-0.5">បង្កើត QR Code ជាមួយ Logo & ពណ៌តាមចិត្ត</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="resetBtn" title="កំណត់ឡើងវិញ" class="px-3 py-1.5 text-xs sm:text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all flex items-center gap-1.5">
+          <i class="fa-solid fa-arrow-rotate-left"></i>
+          <span class="hidden sm:inline">កំណត់ឡើងវិញ</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-1">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      
+      <!-- Control Panel (Left column on large screens) -->
+      <div class="lg:col-span-7 space-y-6">
+        
+        <!-- Input Link / Text Card -->
+        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200/80 transition-all hover:shadow-md">
+          <div class="flex items-center gap-2 text-indigo-600 mb-3">
+            <i class="fa-solid fa-link text-base"></i>
+            <h2 class="text-base font-semibold text-slate-900">បញ្ចូលតំណភ្ជាប់ ឬ អត្ថបទ (URL / Content)</h2>
+          </div>
+          <div class="relative">
+            <input 
+              type="text" 
+              id="qrDataInput" 
+              placeholder="ឧទាហរណ៍៖ https://example.com ឬ អត្ថបទផ្សេងៗ..." 
+              value="https://www.google.com"
+              class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm sm:text-base text-slate-800 transition"
+            >
+          </div>
+          <div class="flex flex-wrap gap-2 mt-3">
+            <button type="button" class="preset-url-btn text-xs bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 px-2.5 py-1 rounded-md transition" data-url="https://facebook.com">
+              <i class="fa-brands fa-facebook mr-1"></i> Facebook
+            </button>
+            <button type="button" class="preset-url-btn text-xs bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 px-2.5 py-1 rounded-md transition" data-url="https://t.me/">
+              <i class="fa-brands fa-telegram mr-1"></i> Telegram
+            </button>
+            <button type="button" class="preset-url-btn text-xs bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 px-2.5 py-1 rounded-md transition" data-url="https://youtube.com">
+              <i class="fa-brands fa-youtube mr-1"></i> YouTube
+            </button>
+            <button type="button" class="preset-url-btn text-xs bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 px-2.5 py-1 rounded-md transition" data-url="WIFI:S:MyWifiNetwork;T:WPA;P:SecretPassword;;">
+              <i class="fa-solid fa-wifi mr-1"></i> WiFi String
+            </button>
+          </div>
+        </div>
+
+        <!-- Color & Gradient Customization -->
+        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200/80 transition-all hover:shadow-md">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2 text-indigo-600">
+              <i class="fa-solid fa-palette text-base"></i>
+              <h2 class="text-base font-semibold text-slate-900">កែប្រែពណ៌ (Color Customization)</h2>
+            </div>
+            
+            <label class="flex items-center gap-2 cursor-pointer text-xs font-medium text-slate-600">
+              <input type="checkbox" id="gradientToggle" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+              <span>ប្រើពណ៌ចម្រុះ (Gradient)</span>
+            </label>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- QR Foreground Color 1 -->
+            <div class="space-y-1.5">
+              <label class="text-xs font-semibold text-slate-600 flex items-center justify-between">
+                <span>ពណ៌ QR (ចម្បង)</span>
+                <span id="fgColor1Val" class="text-slate-400 font-mono text-[11px]">#0f172a</span>
+              </label>
+              <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 p-2 rounded-xl">
+                <input type="color" id="fgColor1" value="#0f172a" class="w-8 h-8 rounded-lg border-0 cursor-pointer p-0 bg-transparent">
+                <input type="text" id="fgColor1Text" value="#0f172a" class="w-full bg-transparent text-xs font-mono uppercase focus:outline-none text-slate-700">
+              </div>
+            </div>
+
+            <!-- QR Foreground Color 2 (For Gradient) -->
+            <div id="gradientColContainer" class="space-y-1.5 opacity-40 pointer-events-none transition-opacity">
+              <label class="text-xs font-semibold text-slate-600 flex items-center justify-between">
+                <span>ពណ៌ QR ទីពីរ (Gradient)</span>
+                <span id="fgColor2Val" class="text-slate-400 font-mono text-[11px]">#4f46e5</span>
+              </label>
+              <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 p-2 rounded-xl">
+                <input type="color" id="fgColor2" value="#4f46e5" class="w-8 h-8 rounded-lg border-0 cursor-pointer p-0 bg-transparent">
+                <input type="text" id="fgColor2Text" value="#4f46e5" class="w-full bg-transparent text-xs font-mono uppercase focus:outline-none text-slate-700">
+              </div>
+            </div>
+
+            <!-- QR Background Color -->
+            <div class="space-y-1.5">
+              <label class="text-xs font-semibold text-slate-600 flex items-center justify-between">
+                <span>ពណ៌ផ្ទៃខាងក្រោយ (Background)</span>
+                <span id="bgColorVal" class="text-slate-400 font-mono text-[11px]">#ffffff</span>
+              </label>
+              <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 p-2 rounded-xl">
+                <input type="color" id="bgColor" value="#ffffff" class="w-8 h-8 rounded-lg border-0 cursor-pointer p-0 bg-transparent">
+                <input type="text" id="bgColorText" value="#ffffff" class="w-full bg-transparent text-xs font-mono uppercase focus:outline-none text-slate-700">
+              </div>
+            </div>
+
+            <!-- Corner Square Color -->
+            <div class="space-y-1.5">
+              <label class="text-xs font-semibold text-slate-600 flex items-center justify-between">
+                <span>ពណ៌ជ្រុង (Corner Eyes)</span>
+                <span id="cornerColorVal" class="text-slate-400 font-mono text-[11px]">#0f172a</span>
+              </label>
+              <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 p-2 rounded-xl">
+                <input type="color" id="cornerColor" value="#0f172a" class="w-8 h-8 rounded-lg border-0 cursor-pointer p-0 bg-transparent">
+                <input type="text" id="cornerColorText" value="#0f172a" class="w-full bg-transparent text-xs font-mono uppercase focus:outline-none text-slate-700">
+              </div>
+            </div>
+          </div>
+
+          <!-- Color Presets -->
+          <div class="mt-4 pt-4 border-t border-slate-100">
+            <span class="text-xs font-semibold text-slate-500 block mb-2">ក្ដារពណ៌ដែលពេញនិយម (Presets):</span>
+            <div class="flex flex-wrap gap-2">
+              <button class="preset-theme-btn px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-medium hover:border-indigo-400 flex items-center gap-1.5" data-fg1="#000000" data-fg2="#000000" data-bg="#ffffff" data-corner="#000000" data-grad="false">
+                <span class="w-3.5 h-3.5 rounded-full bg-black inline-block"></span> បុរាណ (Classic)
+              </button>
+              <button class="preset-theme-btn px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-medium hover:border-indigo-400 flex items-center gap-1.5" data-fg1="#4338ca" data-fg2="#06b6d4" data-bg="#ffffff" data-corner="#312e81" data-grad="true">
+                <span class="w-3.5 h-3.5 rounded-full bg-gradient-to-r from-indigo-700 to-cyan-500 inline-block"></span> ពណ៌មហាសមុទ្រ
+              </button>
+              <button class="preset-theme-btn px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-medium hover:border-indigo-400 flex items-center gap-1.5" data-fg1="#b91c1c" data-fg2="#f97316" data-bg="#ffffff" data-corner="#991b1b" data-grad="true">
+                <span class="w-3.5 h-3.5 rounded-full bg-gradient-to-r from-red-700 to-orange-500 inline-block"></span> ថ្ងៃលិច (Sunset)
+              </button>
+              <button class="preset-theme-btn px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-medium hover:border-indigo-400 flex items-center gap-1.5" data-fg1="#065f46" data-fg2="#10b981" data-bg="#ffffff" data-corner="#064e3b" data-grad="true">
+                <span class="w-3.5 h-3.5 rounded-full bg-gradient-to-r from-emerald-800 to-emerald-500 inline-block"></span> ធម្មជាតិ (Emerald)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Logo Customization -->
+        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200/80 transition-all hover:shadow-md">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2 text-indigo-600">
+              <i class="fa-solid fa-image text-base"></i>
+              <h2 class="text-base font-semibold text-slate-900">ដាក់រូបភាព ឬ Logo នៅចំកណ្តាល</h2>
+            </div>
+            <button id="removeLogoBtn" class="text-xs text-rose-500 hover:text-rose-700 font-medium hidden">
+              <i class="fa-regular fa-trash-can mr-1"></i>លុប Logo
+            </button>
+          </div>
+
+          <div class="space-y-4">
+            <!-- File input area -->
+            <label id="logoDropZone" class="border-2 border-dashed border-slate-300 hover:border-indigo-500 hover:bg-indigo-50/30 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer transition text-center group">
+              <input type="file" id="logoFileInput" accept="image/*" class="hidden">
+              <div class="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mb-2 group-hover:scale-110 transition">
+                <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
+              </div>
+              <p class="text-sm font-semibold text-slate-700">ចុចទីនេះដើម្បីជ្រើសរើស Logo (PNG, JPG, SVG)</p>
+              <p class="text-xs text-slate-400 mt-1">ទំហំដែលល្អបំផុតគឺរាងការ៉េ (Square Aspect Ratio)</p>
+            </label>
+
+            <!-- Sample Logo buttons -->
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-slate-500 font-medium">គំរូ Logo:</span>
+              <div class="flex flex-wrap gap-2">
+                <button type="button" class="preset-logo-btn text-xs px-2.5 py-1 bg-slate-100 hover:bg-slate-200 rounded-md font-medium text-slate-700 flex items-center gap-1.5" data-type="telegram">
+                  <i class="fa-brands fa-telegram text-sky-500"></i> Telegram
+                </button>
+                <button type="button" class="preset-logo-btn text-xs px-2.5 py-1 bg-slate-100 hover:bg-slate-200 rounded-md font-medium text-slate-700 flex items-center gap-1.5" data-type="facebook">
+                  <i class="fa-brands fa-facebook text-blue-600"></i> Facebook
+                </button>
+                <button type="button" class="preset-logo-btn text-xs px-2.5 py-1 bg-slate-100 hover:bg-slate-200 rounded-md font-medium text-slate-700 flex items-center gap-1.5" data-type="youtube">
+                  <i class="fa-brands fa-youtube text-red-600"></i> YouTube
+                </button>
+                <button type="button" class="preset-logo-btn text-xs px-2.5 py-1 bg-slate-100 hover:bg-slate-200 rounded-md font-medium text-slate-700 flex items-center gap-1.5" data-type="shop">
+                  <i class="fa-solid fa-cart-shopping text-emerald-600"></i> Shop
+                </button>
+              </div>
+            </div>
+
+            <!-- Logo Controls (Size & Margin) -->
+            <div id="logoSliders" class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-slate-100">
+              <div>
+                <div class="flex justify-between items-center text-xs font-semibold text-slate-600 mb-1">
+                  <span>ទំហំ Logo (Size)</span>
+                  <span id="logoSizeVal">30%</span>
+                </div>
+                <input type="range" id="logoSize" min="0.1" max="0.45" step="0.02" value="0.3" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+              </div>
+              <div>
+                <div class="flex justify-between items-center text-xs font-semibold text-slate-600 mb-1">
+                  <span>ចន្លោះគែម Logo (Margin)</span>
+                  <span id="logoMarginVal">6px</span>
+                </div>
+                <input type="range" id="logoMargin" min="0" max="20" step="1" value="6" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pattern and Style Selection -->
+        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200/80 transition-all hover:shadow-md">
+          <div class="flex items-center gap-2 text-indigo-600 mb-4">
+            <i class="fa-solid fa-shapes text-base"></i>
+            <h2 class="text-base font-semibold text-slate-900">រចនាប័ទ្មចំណុច និងជ្រុង (Patterns & Shapes)</h2>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Dots Pattern Style -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-2">ទម្រង់ចំណុច QR (Dots Type)</label>
+              <select id="dotsType" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <option value="square">ការ៉េ (Square)</option>
+                <option value="rounded" selected>មូលកោង (Rounded)</option>
+                <option value="dots">ចំណុចមូល (Dots)</option>
+                <option value="classy">Classy</option>
+                <option value="classy-rounded">Classy Rounded</option>
+                <option value="extra-rounded">Extra Rounded</option>
+              </select>
+            </div>
+
+            <!-- Corner Square Style -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-2">រាងជ្រុងធំ (Corner Square Type)</label>
+              <select id="cornerSquareType" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <option value="square">ការ៉េស្រួច (Square)</option>
+                <option value="extra-rounded" selected>មូលកោងស្អាត (Extra Rounded)</option>
+                <option value="dot">រង្វង់មូល (Dot)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Preview & Download Section (Right column on large screens) -->
+      <div class="lg:col-span-5 lg:sticky lg:top-24 space-y-6">
+        <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col items-center">
+          <div class="w-full flex items-center justify-between mb-4">
+            <span class="text-sm font-semibold text-slate-700 flex items-center gap-2">
+              <i class="fa-solid fa-eye text-indigo-600"></i> ទិដ្ឋភាពជាក់ស្ដែង (Live Preview)
+            </span>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> ដំណើរការ
+            </span>
+          </div>
+
+          <!-- QR Canvas Container -->
+          <div class="relative p-3 bg-white rounded-2xl shadow-inner border border-slate-100 flex items-center justify-center min-w-[280px] min-h-[280px]">
+            <div id="qrCanvas" class="flex items-center justify-center overflow-hidden rounded-xl"></div>
+          </div>
+
+          <!-- Download & Export Section -->
+          <div class="w-full mt-6 space-y-3">
+            <!-- PNG Split Button with Resolution Dropdown matching the UI design -->
+            <div class="relative w-full">
+              <div class="flex items-stretch rounded-xl shadow-md overflow-hidden bg-emerald-600 hover:bg-emerald-700 transition">
+                <!-- Main Download PNG Action -->
+                <button id="downloadPngBtn" type="button" class="flex-1 py-3 px-5 text-white font-bold text-base flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 transition">
+                  <i class="fa-solid fa-file-arrow-down text-lg"></i>
+                  <span>PNG</span>
+                </button>
+                
+                <!-- Divider -->
+                <div class="w-[1px] bg-indigo-700"></div>
+                
+                <!-- Size Selector Dropdown Trigger -->
+                <button id="sizeDropdownTrigger" type="button" class="px-3.5 py-3 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white flex items-center gap-1.5 text-sm font-semibold tracking-wide transition" aria-expanded="false">
+                  <span id="selectedSizeLabel">512px</span>
+                  <i class="fa-solid fa-caret-down text-xs transition-transform duration-200" id="dropdownCaret"></i>
+                </button>
+              </div>
+
+              <!-- Dropdown Menu Popover with arrow tooltip pointer -->
+              <div id="sizeDropdownMenu" class="hidden absolute right-0 top-full mt-2 z-50 w-36 bg-white rounded-xl shadow-2xl border border-slate-100 py-1.5 transition-all transform origin-top-right animate-in fade-in zoom-in-95 duration-150">
+                <!-- Little triangle arrow pointing up -->
+                <div class="absolute -top-1.5 right-6 w-3 h-3 bg-white border-t border-l border-slate-100 transform rotate-45"></div>
+
+                <div class="relative z-10 flex flex-col font-bold text-slate-800">
+                  <button type="button" class="size-option text-right px-4 py-2.5 hover:bg-emerald-50 hover:text-emerald-700 transition text-sm flex items-center justify-between" data-size="1024">
+                    <span class="text-xs text-slate-400 font-normal">HD</span>
+                    <span>1024px</span>
+                  </button>
+                  <button type="button" class="size-option text-right px-4 py-2.5 hover:bg-emerald-50 hover:text-emerald-700 transition text-sm flex items-center justify-between bg-emerald-50/60 text-emerald-600" data-size="512">
+                    <span class="text-xs text-emerald-500 font-normal"><i class="fa-solid fa-check text-[10px]"></i></span>
+                    <span>512px</span>
+                  </button>
+                  <button type="button" class="size-option text-right px-4 py-2.5 hover:bg-emerald-50 hover:text-emerald-700 transition text-sm flex items-center justify-between" data-size="256">
+                    <span class="text-xs text-slate-400 font-normal">មធ្យម</span>
+                    <span>256px</span>
+                  </button>
+                  <button type="button" class="size-option text-right px-4 py-2.5 hover:bg-emerald-50 hover:text-emerald-700 transition text-sm flex items-center justify-between" data-size="128">
+                    <span class="text-xs text-slate-400 font-normal">តូច</span>
+                    <span>128px</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Copy PNG Button -->
+            <button id="copyPngBtn" type="button" class="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl font-bold text-sm transition">
+              <i class="fa-regular fa-image"></i>
+              <span>Copy PNG</span>
+            </button>
+
+            <!-- Other Formats (SVG & Copy Content) -->
+            <div class="grid grid-cols-2 gap-2 pt-1">
+              <button id="downloadSvgBtn" type="button" class="flex items-center justify-center gap-1.5 py-2 px-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-medium text-xs transition">
+                <i class="fa-solid fa-file-code"></i>
+                <span>ទាញយក SVG</span>
+              </button>
+              <button id="copyLinkBtn" type="button" class="flex items-center justify-center gap-1.5 py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium text-xs transition">
+                <i class="fa-regular fa-copy"></i>
+                <span>ចម្លង Link</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Info notification toast inside preview card -->
+          <div id="toastMessage" class="hidden mt-3 text-xs text-center py-2 px-3 rounded-lg w-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium transition-all">
+            បានចម្លងដោយជោគជ័យ!
+          </div>
+
+          <div class="mt-4 pt-4 border-t border-slate-100 text-center w-full">
+            <p class="text-xs text-slate-400">
+              <i class="fa-solid fa-shield-halved mr-1"></i> កម្រិតកែតម្រូវកំហុសខ្ពស់ (High Error Correction: Q) ធានាថានៅតែអាចស្កេនបានយ៉ាងរហ័សទោះបីមាន Logo នៅកណ្តាល។
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="border-t border-slate-200 bg-white py-6 mt-12 text-center text-xs text-slate-500">
+    <p>កម្មវិធីបង្កើត QR Code ទំនើប &copy; 2026 — រៀបចំឡើងដោយ <a href="https://t.me/cseyha" class="text-indigo-600 hover:text-indigo-800">CHROENG Seyha</a></p>
+  </footer>
+
+  <script>
+    // State management
+    const state = {
+      data: 'https://www.google.com',
+      fgColor1: '#0f172a',
+      fgColor2: '#4f46e5',
+      bgColor: '#ffffff',
+      cornerColor: '#0f172a',
+      isGradient: false,
+      dotsType: 'rounded',
+      cornerSquareType: 'extra-rounded',
+      logo: null,
+      logoSize: 0.3,
+      logoMargin: 6,
+      exportSize: 512, // Selected export resolution in pixels
+    };
+
+    // DOM Elements
+    const qrCanvas = document.getElementById('qrCanvas');
+    const qrDataInput = document.getElementById('qrDataInput');
+    const fgColor1 = document.getElementById('fgColor1');
+    const fgColor1Text = document.getElementById('fgColor1Text');
+    const fgColor1Val = document.getElementById('fgColor1Val');
+    
+    const fgColor2 = document.getElementById('fgColor2');
+    const fgColor2Text = document.getElementById('fgColor2Text');
+    const fgColor2Val = document.getElementById('fgColor2Val');
+    
+    const bgColor = document.getElementById('bgColor');
+    const bgColorText = document.getElementById('bgColorText');
+    const bgColorVal = document.getElementById('bgColorVal');
+    
+    const cornerColor = document.getElementById('cornerColor');
+    const cornerColorText = document.getElementById('cornerColorText');
+    const cornerColorVal = document.getElementById('cornerColorVal');
+
+    const gradientToggle = document.getElementById('gradientToggle');
+    const gradientColContainer = document.getElementById('gradientColContainer');
+    
+    const dotsTypeSelect = document.getElementById('dotsType');
+    const cornerSquareTypeSelect = document.getElementById('cornerSquareType');
+
+    const logoFileInput = document.getElementById('logoFileInput');
+    const removeLogoBtn = document.getElementById('removeLogoBtn');
+    const logoSize = document.getElementById('logoSize');
+    const logoSizeVal = document.getElementById('logoSizeVal');
+    const logoMargin = document.getElementById('logoMargin');
+    const logoMarginVal = document.getElementById('logoMarginVal');
+
+    const downloadPngBtn = document.getElementById('downloadPngBtn');
+    const downloadSvgBtn = document.getElementById('downloadSvgBtn');
+    const copyPngBtn = document.getElementById('copyPngBtn');
+    const copyLinkBtn = document.getElementById('copyLinkBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const toastMessage = document.getElementById('toastMessage');
+
+    // Dropdown elements
+    const sizeDropdownTrigger = document.getElementById('sizeDropdownTrigger');
+    const sizeDropdownMenu = document.getElementById('sizeDropdownMenu');
+    const selectedSizeLabel = document.getElementById('selectedSizeLabel');
+    const dropdownCaret = document.getElementById('dropdownCaret');
+    const sizeOptions = document.querySelectorAll('.size-option');
+
+    // Create SVG Data URL for presets
+    function createSvgDataUrl(svgString) {
+      return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgString);
+    }
+
+    const presetSvgLogos = {
+      telegram: createSvgDataUrl('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path fill="#0088cc" d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm121.8 169.9l-40.7 191.8c-3 13.6-11.1 16.9-22.4 10.5l-62-45.7-29.9 28.8c-3.3 3.3-6.1 6.1-12.5 6.1l4.4-63.1 114.9-103.8c5-4.4-1.1-6.9-7.7-2.5l-142 89.4-61.2-19.1c-13.3-4.2-13.6-13.3 2.8-19.7l239.1-92.2c11.1-4 20.8 2.7 17.2 18.9z"/></svg>'),
+      facebook: createSvgDataUrl('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="#1877F2" d="M504 256C504 119 393 8 256 8S8 119 8 256c0 123.78 90.69 226.38 209.25 245V327.69h-63V256h63v-54.64c0-62.15 37-96.48 93.67-96.48 27.14 0 55.52 4.84 55.52 4.84v61h-31.28c-30.8 0-40.41 19.12-40.41 38.73V256h68.78l-11 71.69h-57.78V501C413.31 482.38 504 379.78 504 256z"/></svg>'),
+      youtube: createSvgDataUrl('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path fill="#FF0000" d="M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.22 448 288 448 288 448s170.78 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821 11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305zm-317.51 213.583V174.334l142.739 81.666-142.739 81.666z"/></svg>'),
+      shop: createSvgDataUrl('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path fill="#059669" d="M0 24C0 10.7 10.7 0 24 0H69.5c22 0 41.5 12.8 50.6 32h411c26.3 0 45.5 25 38.6 50.4l-41 152.3c-8.5 31.4-37 53.3-69.5 53.3H170.7l5.4 28.5c2.2 11.3 12.1 19.5 23.6 19.5H488c13.3 0 24 10.7 24 24s-10.7 24-24 24H199.7c-34.6 0-64.3-24.6-70.7-58.5L77.4 54.5c-.7-3.8-4-6.5-7.9-6.5H24C10.7 48 0 37.3 0 24zM128 464a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm336-48a48 48 0 1 1 0 96 48 48 0 1 1 0-96z"/></svg>')
+    };
+
+    // Helper to generate QRCode configuration
+    function getQrConfig(pixelSize = 270) {
+      let dotsOptions = {
+        type: state.dotsType
+      };
+
+      if (state.isGradient) {
+        dotsOptions.gradient = {
+          type: 'linear',
+          rotation: 45,
+          colorStops: [
+            { offset: 0, color: state.fgColor1 },
+            { offset: 1, color: state.fgColor2 }
+          ]
+        };
+      } else {
+        dotsOptions.color = state.fgColor1;
+      }
+
+      return {
+        width: pixelSize,
+        height: pixelSize,
+        type: 'canvas',
+        data: state.data || ' ',
+        image: state.logo,
+        margin: Math.round(pixelSize * 0.03),
+        qrOptions: {
+          typeNumber: 0,
+          mode: 'Byte',
+          errorCorrectionLevel: 'Q'
+        },
+        imageOptions: {
+          hideBackgroundDots: true,
+          imageSize: state.logoSize,
+          margin: state.logoMargin,
+          crossOrigin: 'anonymous',
+        },
+        dotsOptions: dotsOptions,
+        backgroundOptions: {
+          color: state.bgColor,
+        },
+        cornersSquareOptions: {
+          color: state.cornerColor,
+          type: state.cornerSquareType
+        },
+        cornersDotOptions: {
+          color: state.cornerColor,
+          type: state.cornerSquareType === 'square' ? 'square' : 'dot'
+        }
+      };
+    }
+
+    // Initialize Preview QR Code Styling instance
+    let qrCode = new QRCodeStyling(getQrConfig(270));
+    qrCode.append(qrCanvas);
+
+    function updateQRCode() {
+      qrCode.update(getQrConfig(270));
+    }
+
+    function showNotification(msg) {
+      toastMessage.textContent = msg;
+      toastMessage.classList.remove('hidden');
+      setTimeout(() => {
+        toastMessage.classList.add('hidden');
+      }, 2500);
+    }
+
+    // Toggle Dropdown Menu
+    sizeDropdownTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isHidden = sizeDropdownMenu.classList.contains('hidden');
+      if (isHidden) {
+        sizeDropdownMenu.classList.remove('hidden');
+        dropdownCaret.classList.add('rotate-180');
+      } else {
+        sizeDropdownMenu.classList.add('hidden');
+        dropdownCaret.classList.remove('rotate-180');
+      }
+    });
+
+    // Close Dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!sizeDropdownMenu.contains(e.target) && !sizeDropdownTrigger.contains(e.target)) {
+        sizeDropdownMenu.classList.add('hidden');
+        dropdownCaret.classList.remove('rotate-180');
+      }
+    });
+
+    // Select Size option
+    sizeOptions.forEach(opt => {
+      opt.addEventListener('click', (e) => {
+        const size = parseInt(opt.getAttribute('data-size'), 10);
+        state.exportSize = size;
+        selectedSizeLabel.textContent = `${size}px`;
+
+        // Update active highlight style
+        sizeOptions.forEach(b => {
+          b.classList.remove('bg-emerald-50/60', 'text-emerald-600');
+          const checkIcon = b.querySelector('.fa-check');
+          if (checkIcon) checkIcon.parentElement.innerHTML = '';
+        });
+        opt.classList.add('bg-emerald-50/60', 'text-emerald-600');
+        const iconSpan = opt.firstElementChild;
+        iconSpan.innerHTML = '<i class="fa-solid fa-check text-[10px]"></i>';
+
+        sizeDropdownMenu.classList.add('hidden');
+        dropdownCaret.classList.remove('rotate-180');
+
+        // Automatically trigger download with the selected size
+        downloadPngWithSize(size);
+      });
+    });
+
+    // Download PNG with specific pixel dimension
+    async function downloadPngWithSize(pixelSize) {
+      try {
+        showNotification(`កំពុងបង្កើត QR Code ទំហំ ${pixelSize}px...`);
+        const exportInstance = new QRCodeStyling(getQrConfig(pixelSize));
+        await exportInstance.download({
+          name: `qrcode_${pixelSize}px_${Date.now()}`,
+          extension: 'png'
+        });
+        showNotification(`បានទាញយក PNG (${pixelSize}px) ដោយជោគជ័យ!`);
+      } catch (err) {
+        showNotification('មានបញ្ហាក្នុងការទាញយក');
+      }
+    }
+
+    // Main PNG button click (uses the currently selected size)
+    downloadPngBtn.addEventListener('click', () => {
+      downloadPngWithSize(state.exportSize);
+    });
+
+    // Copy PNG to Clipboard
+    copyPngBtn.addEventListener('click', async () => {
+      try {
+        const exportInstance = new QRCodeStyling(getQrConfig(state.exportSize));
+        const rawBlob = await exportInstance.getRawData('png');
+        
+        if (navigator.clipboard && window.ClipboardItem) {
+          const item = new ClipboardItem({ 'image/png': rawBlob });
+          await navigator.clipboard.write([item]);
+          showNotification(`បាន Copy រូបភាព PNG (${state.exportSize}px) ចូល Clipboard!`);
+        } else {
+          showNotification('ឧបករណ៍ ឬកម្មវិធីរុករកមិនគាំទ្រ Copy រូបភាពផ្ទាល់ទេ');
+        }
+      } catch (err) {
+        // Fallback for browsers with strict permissions
+        showNotification('មិនអាច Copy រូបភាពបានទេ សូមទាញយកជា file ជំនួសវិញ');
+      }
+    });
+
+    // Download SVG
+    downloadSvgBtn.addEventListener('click', () => {
+      try {
+        qrCode.download({
+          name: 'qrcode_' + Date.now(),
+          extension: 'svg'
+        });
+        showNotification('បានទាញយក SVG ដោយជោគជ័យ!');
+      } catch (err) {
+        showNotification('មានបញ្ហាក្នុងការទាញយក');
+      }
+    });
+
+    // Input Data change
+    qrDataInput.addEventListener('input', (e) => {
+      state.data = e.target.value.trim() || ' ';
+      updateQRCode();
+    });
+
+    // Preset URL Buttons
+    document.querySelectorAll('.preset-url-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const url = btn.getAttribute('data-url');
+        qrDataInput.value = url;
+        state.data = url;
+        updateQRCode();
+      });
+    });
+
+    // Color synchronization helpers
+    function syncColor(inputPicker, textInput, valDisplay, stateKey) {
+      function applyVal(val) {
+        if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
+          state[stateKey] = val;
+          inputPicker.value = val;
+          textInput.value = val;
+          valDisplay.textContent = val.toLowerCase();
+          updateQRCode();
+        }
+      }
+
+      inputPicker.addEventListener('input', (e) => applyVal(e.target.value));
+      textInput.addEventListener('input', (e) => {
+        let v = e.target.value.trim();
+        if (!v.startsWith('#')) v = '#' + v;
+        if (v.length === 7) applyVal(v);
+      });
+    }
+
+    syncColor(fgColor1, fgColor1Text, fgColor1Val, 'fgColor1');
+    syncColor(fgColor2, fgColor2Text, fgColor2Val, 'fgColor2');
+    syncColor(bgColor, bgColorText, bgColorVal, 'bgColor');
+    syncColor(cornerColor, cornerColorText, cornerColorVal, 'cornerColor');
+
+    // Gradient toggle
+    gradientToggle.addEventListener('change', (e) => {
+      state.isGradient = e.target.checked;
+      if (state.isGradient) {
+        gradientColContainer.classList.remove('opacity-40', 'pointer-events-none');
+      } else {
+        gradientColContainer.classList.add('opacity-40', 'pointer-events-none');
+      }
+      updateQRCode();
+    });
+
+    // Color Theme Presets
+    document.querySelectorAll('.preset-theme-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const fg1 = btn.getAttribute('data-fg1');
+        const fg2 = btn.getAttribute('data-fg2');
+        const bg = btn.getAttribute('data-bg');
+        const corner = btn.getAttribute('data-corner');
+        const grad = btn.getAttribute('data-grad') === 'true';
+
+        state.fgColor1 = fg1;
+        state.fgColor2 = fg2;
+        state.bgColor = bg;
+        state.cornerColor = corner;
+        state.isGradient = grad;
+
+        // Sync inputs
+        fgColor1.value = fg1;
+        fgColor1Text.value = fg1;
+        fgColor1Val.textContent = fg1;
+
+        fgColor2.value = fg2;
+        fgColor2Text.value = fg2;
+        fgColor2Val.textContent = fg2;
+
+        bgColor.value = bg;
+        bgColorText.value = bg;
+        bgColorVal.textContent = bg;
+
+        cornerColor.value = corner;
+        cornerColorText.value = corner;
+        cornerColorVal.textContent = corner;
+
+        gradientToggle.checked = grad;
+        if (grad) {
+          gradientColContainer.classList.remove('opacity-40', 'pointer-events-none');
+        } else {
+          gradientColContainer.classList.add('opacity-40', 'pointer-events-none');
+        }
+
+        updateQRCode();
+      });
+    });
+
+    // Pattern & Corner changes
+    dotsTypeSelect.addEventListener('change', (e) => {
+      state.dotsType = e.target.value;
+      updateQRCode();
+    });
+
+    cornerSquareTypeSelect.addEventListener('change', (e) => {
+      state.cornerSquareType = e.target.value;
+      updateQRCode();
+    });
+
+    // Logo Upload Handling
+    logoFileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          state.logo = event.target.result;
+          removeLogoBtn.classList.remove('hidden');
+          updateQRCode();
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Preset Logo Buttons
+    document.querySelectorAll('.preset-logo-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const type = btn.getAttribute('data-type');
+        if (presetSvgLogos[type]) {
+          state.logo = presetSvgLogos[type];
+          removeLogoBtn.classList.remove('hidden');
+          updateQRCode();
+        }
+      });
+    });
+
+    // Remove Logo Button
+    removeLogoBtn.addEventListener('click', () => {
+      state.logo = null;
+      logoFileInput.value = '';
+      removeLogoBtn.classList.add('hidden');
+      updateQRCode();
+    });
+
+    // Logo Size and Margin Sliders
+    logoSize.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      state.logoSize = val;
+      logoSizeVal.textContent = Math.round(val * 100) + '%';
+      updateQRCode();
+    });
+
+    logoMargin.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value, 10);
+      state.logoMargin = val;
+      logoMarginVal.textContent = val + 'px';
+      updateQRCode();
+    });
+
+    // Copy Content Link
+    copyLinkBtn.addEventListener('click', () => {
+      const textToCopy = qrDataInput.value.trim();
+      if (!textToCopy) return;
+
+      const tempInput = document.createElement('input');
+      tempInput.value = textToCopy;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      try {
+        document.execCommand('copy');
+        showNotification('បានចម្លងតំណភ្ជាប់ជោគជ័យ!');
+      } catch (err) {
+        showNotification('មិនអាចចម្លងបានទេ');
+      }
+      document.body.removeChild(tempInput);
+    });
+
+    // Reset button
+    resetBtn.addEventListener('click', () => {
+      qrDataInput.value = 'https://www.google.com';
+      state.data = 'https://www.google.com';
+      state.fgColor1 = '#0f172a';
+      state.fgColor2 = '#4f46e5';
+      state.bgColor = '#ffffff';
+      state.cornerColor = '#0f172a';
+      state.isGradient = false;
+      state.dotsType = 'rounded';
+      state.cornerSquareType = 'extra-rounded';
+      state.logo = null;
+      state.logoSize = 0.3;
+      state.logoMargin = 6;
+      state.exportSize = 512;
+      selectedSizeLabel.textContent = '512px';
+
+      // Reset DOM values
+      fgColor1.value = '#0f172a';
+      fgColor1Text.value = '#0f172a';
+      fgColor1Val.textContent = '#0f172a';
+      
+      fgColor2.value = '#4f46e5';
+      fgColor2Text.value = '#4f46e5';
+      fgColor2Val.textContent = '#4f46e5';
+
+      bgColor.value = '#ffffff';
+      bgColorText.value = '#ffffff';
+      bgColorVal.textContent = '#ffffff';
+
+      cornerColor.value = '#0f172a';
+      cornerColorText.value = '#0f172a';
+      cornerColorVal.textContent = '#0f172a';
+
+      gradientToggle.checked = false;
+      gradientColContainer.classList.add('opacity-40', 'pointer-events-none');
+      
+      dotsTypeSelect.value = 'rounded';
+      cornerSquareTypeSelect.value = 'extra-rounded';
+
+      logoFileInput.value = '';
+      removeLogoBtn.classList.add('hidden');
+      logoSize.value = 0.3;
+      logoSizeVal.textContent = '30%';
+      logoMargin.value = 6;
+      logoMarginVal.textContent = '6px';
+
+      updateQRCode();
+      showNotification('បានកំណត់ឡើងវិញ');
+    });
+
+    // Initial render
+    updateQRCode();
+  </script>
+</body>
+</html>
